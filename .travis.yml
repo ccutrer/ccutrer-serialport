@@ -1,0 +1,11 @@
+sudo: false
+language: ruby
+addons:
+  apt:
+    packages:
+      - socat
+rvm:
+  - 2.7
+  - 2.6
+script:
+  - bundle exec rake spec
