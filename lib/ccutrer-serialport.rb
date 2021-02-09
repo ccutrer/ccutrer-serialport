@@ -10,11 +10,16 @@ module CCutrer
 
     if ON_WINDOWS
       raise "rubyserial is not currently supported on windows"
-    elsif ON_LINUX
+    end
+
+    # order is important here
+    require 'ccutrer/serial_port/termios'
+    if ON_LINUX
       require 'ccutrer/serial_port/linux'
     else
       require 'ccutrer/serial_port/osx'
     end
+    require 'ccutrer/serial_port/posix'
   end
 end
 

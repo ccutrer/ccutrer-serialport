@@ -1,20 +1,33 @@
-# Copyright (c) 2014-2016 The Hybrid Group, 2020 Cody Cutrer
+# Copyright (c) 2014-2016 The Hybrid Group, 2020-2021 Cody Cutrer
 
-module CCutrer::SerialPort::Posix
-  extend FFI::Library
-  ffi_lib FFI::Library::LIBC
+module CCutrer::SerialPort::Termios
+  NCCS = 20
 
-  IGNPAR = 0x00000004
-  PARENB = 0x00001000
-  PARODD = 0x00002000
+  class Termios < FFI::Struct
+    layout  :c_iflag, :ulong,
+            :c_oflag, :ulong,
+            :c_cflag, :ulong,
+            :c_lflag, :ulong,
+            :c_line, :uchar,
+            :c_cc, [ :uchar, NCCS ],
+            :c_ispeed, :ulong,
+            :c_ospeed, :ulong
+  end
+
+  # c_cc characters
   VMIN = 16
   VTIME = 17
-  CLOCAL = 0x00008000
+
+  # c_iflag bits
+  IGNPAR = 0x00000004
+
+  # c_cflag bits
+  CSIZE  = 0x00000700
   CSTOPB = 0x00000400
   CREAD  = 0x00000800
-  CCTS_OFLOW = 0x00010000 # Clearing this disables RTS AND CTS.
-  TCSANOW = 0
-  NCCS = 20
+  PARENB = 0x00001000
+  PARODD = 0x00002000
+  CLOCAL = 0x00008000
 
   DATA_BITS = {
     5 => 0x00000000,
@@ -55,22 +68,10 @@ module CCutrer::SerialPort::Posix
     :odd => PARENB | PARODD,
   }
 
-  STOPBITS = {
+  STOP_BITS = {
     1 => 0x00000000,
     2 => CSTOPB
   }
 
-  class Termios < FFI::Struct
-    layout  :c_iflag, :ulong,
-            :c_oflag, :ulong,
-            :c_cflag, :ulong,
-            :c_lflag, :ulong,
-            :c_line, :uchar,
-            :cc_c, [ :uchar, NCCS ],
-            :c_ispeed, :ulong,
-            :c_ospeed, :ulong
-  end
-
-  attach_function :tcsetattr, [ :int, :int, Termios ], :int, blocking: true
-  attach_function :tcgetattr, [ :int, Termios ], :int, blocking: true
+  TCSANOW = 0
 end

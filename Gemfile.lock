@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ccutrer-serialport (1.0.0)
+    ccutrer-serialport (1.1.0)
       ffi (~> 1.9, >= 1.9.3)
 
 GEM
