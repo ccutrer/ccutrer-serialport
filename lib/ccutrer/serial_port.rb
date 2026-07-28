@@ -2,17 +2,12 @@
 
 # Copyright (c) 2014-2016 The Hybrid Group, 2020 Cody Cutrer
 
-require "fcntl"
-
 module CCutrer
   class SerialPort < File
     def initialize(address, baud: nil, data_bits: nil, parity: nil, stop_bits: nil)
       super(address, IO::RDWR | IO::NOCTTY | IO::NONBLOCK)
 
       raise IOError, "Not a serial port" unless tty?
-
-      fl = fcntl(Fcntl::F_GETFL, 0)
-      fcntl(Fcntl::F_SETFL, ~Fcntl::O_NONBLOCK & fl)
 
       @termios = Termios::Termios.new
       refresh
@@ -38,6 +33,18 @@ module CCutrer
       raise Errno::EINVAL if data_bits && data_bits != self.data_bits
       raise Errno::EINVAL if parity && parity != self.parity
       raise Errno::EINVAL if stop_bits && stop_bits != self.stop_bits
+    end
+
+    # Read up to +length+ bytes that are currently available without waiting.
+    def read(length, outbuf = nil)
+      result = read_nonblock(length, outbuf, exception: false)
+      return result unless result == :wait_readable
+
+      nil
+    end
+
+    def getbyte
+      read(1)&.getbyte(0)
     end
 
     def configure

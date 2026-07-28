@@ -34,7 +34,7 @@ module CCutrer
       IGNPAR = 0x00000004
 
       # c_cflag bits
-      CSIZE  = 0x00000700
+      CSIZE  = 0x00000300
       CSTOPB = 0x00000400
       CREAD  = 0x00000800
       PARENB = 0x00001000

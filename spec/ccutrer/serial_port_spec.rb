@@ -63,6 +63,12 @@ describe CCutrer::SerialPort do
     expect(sp.read(5)).to be_nil
   end
 
+  it "should return available data without waiting for the requested length" do
+    sp2.write("hi")
+    sleep 0.1
+    expect(sp.read(5)).to eql("hi")
+  end
+
   it "should give me nil on getbyte" do
     expect(sp.getbyte).to be_nil
   end
