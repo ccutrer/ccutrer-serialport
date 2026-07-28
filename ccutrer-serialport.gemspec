@@ -18,7 +18,4 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency 'ffi', '~> 1.9', '>= 1.9.3'
-
-  s.add_development_dependency 'rake', '~> 13.0'
-  s.add_development_dependency 'rspec', '~> 3.0.0'
 end
