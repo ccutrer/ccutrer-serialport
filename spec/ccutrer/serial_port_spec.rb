@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 describe CCutrer::SerialPort do
+  let(:socat_pid) { spawn("socat -lf socat.log -d -d pty,raw,echo=0 pty,raw,echo=0") }
   let(:ports) do
     File.delete("socat.log") if File.file?("socat.log")
 
     `socat -h`
     raise "socat not found" unless $?.success?
 
-    Thread.new do
-      system("socat -lf socat.log -d -d pty,raw,echo=0 pty,raw,echo=0")
-    end
+    socat_pid
 
     ptys = nil
 
@@ -39,6 +38,12 @@ describe CCutrer::SerialPort do
       sp2.close
     rescue Errno::ENOENT
       # ignore
+    end
+    begin
+      Process.kill("TERM", socat_pid)
+      Process.wait(socat_pid)
+    rescue Errno::ESRCH, Errno::ECHILD
+      # socat already exited
     end
   end
 
