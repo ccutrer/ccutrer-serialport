@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2014-2016 The Hybrid Group, 2020 Cody Cutrer
 
 require "fcntl"
@@ -95,7 +97,7 @@ module CCutrer
     end
 
     def stop_bits
-      (@termios[:c_cflag] & Termios::CSTOPB).zero? ? 1 : 2
+      @termios[:c_cflag].nobits?(Termios::CSTOPB) ? 1 : 2
     end
 
     def stop_bits=(stop_bits)

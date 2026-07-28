@@ -7,7 +7,7 @@ plugins:
   - rubocop-rake
 
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 3.1
 
 Naming/FileName:
   Exclude:

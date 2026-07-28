@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe CCutrer::SerialPort do
   before do
     @ports = []

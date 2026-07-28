@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "lib/ccutrer/serial_port/version"
 
 Gem::Specification.new do |s|
@@ -11,7 +13,7 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
   s.metadata["rubygems_mfa_required"] = "true"
 
-  s.required_ruby_version = ">= 2.0"
+  s.required_ruby_version = ">= 3.1"
 
   s.files         = Dir["{lib}/**/*"]
   s.require_paths = ["lib"]
