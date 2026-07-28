@@ -1,5 +1,4 @@
-$:.push File.expand_path("../lib", __FILE__)
-require "ccutrer/serial_port/version"
+require_relative "lib/ccutrer/serial_port/version"
 
 Gem::Specification.new do |s|
   s.name        = "ccutrer-serialport"
@@ -9,13 +8,13 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/ccutrer/ccutrer-serialport"
   s.authors     = ["Cody Cutrer"]
   s.platform    = Gem::Platform::RUBY
-  s.license     = 'MIT'
+  s.license     = "MIT"
+  s.metadata["rubygems_mfa_required"] = "true"
 
-  s.required_ruby_version = '>= 2.0'
+  s.required_ruby_version = ">= 2.0"
 
-  s.files         = `git ls-files`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = Dir["{lib}/**/*"]
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency 'ffi', '~> 1.9', '>= 1.9.3'
+  s.add_dependency "ffi", "~> 1.9", ">= 1.9.3"
 end

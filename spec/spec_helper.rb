@@ -1,2 +1,1 @@
-RSpec.configure do |config|
-end
+require "ccutrer-serialport"

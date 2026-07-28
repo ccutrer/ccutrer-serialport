@@ -1,27 +1,26 @@
-require 'ccutrer-serialport'
-
 describe CCutrer::SerialPort do
   before do
     @ports = []
-    File.delete('socat.log') if File.file?('socat.log')
+    File.delete("socat.log") if File.file?("socat.log")
 
-    raise 'socat not found' unless (`socat -h` && $? == 0)
+    `socat -h`
+    raise "socat not found" unless $?.success?
 
     Thread.new do
-      system('socat -lf socat.log -d -d pty,raw,echo=0 pty,raw,echo=0')
+      system("socat -lf socat.log -d -d pty,raw,echo=0 pty,raw,echo=0")
     end
 
     @ptys = nil
 
     loop do
-      if File.file? 'socat.log'
-        @file = File.open('socat.log', "r")
-        @fileread = @file.read
+      next unless File.file? "socat.log"
 
-        unless @fileread.count("\n") < 3
-          @ptys = @fileread.scan(/PTY is (.*)/)
-          break
-        end
+      @file = File.open("socat.log", "r")
+      @fileread = @file.read
+
+      unless @fileread.count("\n") < 3
+        @ptys = @fileread.scan(/PTY is (.*)/)
+        break
       end
     end
 
@@ -32,26 +31,26 @@ describe CCutrer::SerialPort do
   end
 
   after do
-   @sp2.close
-   @sp.close
+    @sp2.close
+    @sp.close
   end
 
   it "should read and write" do
-    @sp2.write('hello')
+    @sp2.write("hello")
     # small delay so it can write to the other port.
     sleep 0.1
     check = @sp.read(5)
-    expect(check).to eql('hello')
+    expect(check).to eql("hello")
   end
 
   it "should convert ints to strings" do
-    expect(@sp2.write(123)).to eql(3)
+    expect(@sp2.write(123)).to be(3)
     sleep 0.1
-    expect(@sp.read(3)).to eql('123')
+    expect(@sp.read(3)).to eql("123")
   end
 
   it "write should return bytes written" do
-    expect(@sp2.write('hello')).to eql(5)
+    expect(@sp2.write("hello")).to be(5)
   end
 
   it "reading nothing should be blank" do
@@ -62,18 +61,18 @@ describe CCutrer::SerialPort do
     expect(@sp.getbyte).to be_nil
   end
 
-  it 'should give me a zero byte from getbyte' do
+  it "should give me a zero byte from getbyte" do
     @sp2.write("\x00")
     sleep 0.1
-    expect(@sp.getbyte).to eql(0)
+    expect(@sp.getbyte).to be(0)
   end
 
   it "should give me bytes" do
-    @sp2.write('hello')
+    @sp2.write("hello")
     # small delay so it can write to the other port.
     sleep 0.1
     check = @sp.getbyte
-    expect([check].pack('C')).to eql('h')
+    expect([check].pack("C")).to eql("h")
   end
 
   describe "giving me lines" do
@@ -89,15 +88,15 @@ describe CCutrer::SerialPort do
       result = ""
       @sp2.each_line do |line|
         result = line
-        break if !result.empty?
+        break unless result.empty?
       end
       expect(result).to eql("no yes \n")
     end
 
     it "should accept a sep param" do
-      @sp.write('no yes END bleh')
+      @sp.write("no yes END bleh")
       sleep 0.1
-      expect(@sp2.gets('END')).to eql("no yes END")
+      expect(@sp2.gets("END")).to eql("no yes END")
     end
 
     it "should accept a limit param" do
@@ -109,62 +108,62 @@ describe CCutrer::SerialPort do
     it "should accept limit and sep params" do
       @sp.write("no yes END hello")
       sleep 0.1
-      expect(@sp2.gets('END', 20)).to eql("no yes END")
+      expect(@sp2.gets("END", 20)).to eql("no yes END")
       @sp2.read(1000)
       @sp.write("no yes END hello")
       sleep 0.1
-      expect(@sp2.gets('END', 4)).to eql('no y')
+      expect(@sp2.gets("END", 4)).to eql("no y")
     end
 
     it "should read a paragraph at a time" do
       @sp.write("Something \n Something else \n\n and other stuff")
       sleep 0.1
-      expect(@sp2.gets('')).to eql("Something \n Something else \n\n")
+      expect(@sp2.gets("")).to eql("Something \n Something else \n\n")
     end
   end
 
-  describe 'config' do
-    it 'should accept EVEN parity' do
+  describe "config" do
+    it "should accept EVEN parity" do
       @sp2.close
       @sp.close
-      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19200, data_bits: 8, parity: :even)
-      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19200, data_bits: 8, parity: :even)
+      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19_200, data_bits: 8, parity: :even)
+      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19_200, data_bits: 8, parity: :even)
       @sp.write("Hello!\n")
       sleep 0.1
       expect(@sp2.gets).to eql("Hello!\n")
     end
 
-    it 'should accept ODD parity' do
+    it "should accept ODD parity" do
       @sp2.close
       @sp.close
-      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19200, data_bits: 8, parity: :odd)
-      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19200, data_bits: 8, parity: :odd)
+      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19_200, data_bits: 8, parity: :odd)
+      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19_200, data_bits: 8, parity: :odd)
       @sp.write("Hello!\n")
       sleep 0.1
       expect(@sp2.gets).to eql("Hello!\n")
     end
 
-    it 'should accept 1 stop bit' do
+    it "should accept 1 stop bit" do
       @sp2.close
       @sp.close
-      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19200, data_bits: 8, parity: :none, stop_bits: 1)
-      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19200, data_bits: 8, parity: :none, stop_bits: 1)
+      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19_200, data_bits: 8, parity: :none, stop_bits: 1)
+      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19_200, data_bits: 8, parity: :none, stop_bits: 1)
       @sp.write("Hello!\n")
       sleep 0.1
       expect(@sp2.gets).to eql("Hello!\n")
     end
 
-    it 'should accept 2 stop bits' do
+    it "should accept 2 stop bits" do
       @sp2.close
       @sp.close
-      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19200, data_bits: 8, parity: :none, stop_bits: 2)
-      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19200, data_bits: 8, parity: :none, stop_bits: 2)
+      @sp2 = CCutrer::SerialPort.new(@ports[0], baud: 19_200, data_bits: 8, parity: :none, stop_bits: 2)
+      @sp = CCutrer::SerialPort.new(@ports[1], baud: 19_200, data_bits: 8, parity: :none, stop_bits: 2)
       @sp.write("Hello!\n")
       sleep 0.1
       expect(@sp2.gets).to eql("Hello!\n")
     end
 
-    it 'should set baud rate, check #46 fixed' do
+    it "should set baud rate, check #46 fixed" do
       @sp.close
       rate = 600
       @sp = CCutrer::SerialPort.new(@ports[1], baud: rate)
