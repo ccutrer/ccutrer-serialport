@@ -70,6 +70,21 @@ module CCutrer::SerialPort::Termios
     4000000 => 0010017
   }
 
+  # Check whether cfsetospeed expects true numeric baud rates (glibc >= 2.42).
+  numeric_baud_rates =
+    begin
+      attach_function :dlvsym, [ :pointer, :string, :string ], :pointer
+      dlvsym(FFI::Pointer::NULL, "cfsetospeed", "GLIBC_2.42") != FFI::Pointer::NULL
+    rescue FFI::NotFoundError # dlvsym not found
+      false
+    end
+
+  if numeric_baud_rates
+    numeric_map = Hash[BAUD_RATES.keys.map { |rate| [rate, rate] }]
+    remove_const(:BAUD_RATES)
+    BAUD_RATES = numeric_map
+  end
+
   PARITY = {
     none: 0000000,
     even: PARENB,
