@@ -177,7 +177,11 @@ describe CCutrer::SerialPort do
       fd = sp.fileno
       termios = CCutrer::SerialPort::Termios::Termios.new
       CCutrer::SerialPort::Termios.tcgetattr(fd, termios)
-      expect(termios[:c_ispeed]).to eql(CCutrer::SerialPort::Termios::BAUD_RATES[rate])
+      if CCutrer::SerialPort::Termios.respond_to?(:cfgetibaud)
+        expect(CCutrer::SerialPort::Termios.cfgetibaud(termios)).to be rate
+      else
+        expect(termios[:c_ispeed]).to eql(CCutrer::SerialPort::Termios::BAUD_RATES[rate])
+      end
     end
   end
 end

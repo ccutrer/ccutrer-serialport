@@ -57,22 +57,40 @@ module CCutrer
       @configuring = false
     end
 
-    def baud
-      Termios::BAUD_RATES.invert[Termios.cfgetispeed(@termios)]
-    end
+    if Termios.respond_to?(:cfgetibaud)
+      def baud
+        Termios.cfgetibaud(@termios)
+      end
 
-    def baud=(baud)
-      raise ArgumentError, "Invalid baud" unless Termios::BAUD_RATES.key?(baud)
+      def baud=(baud)
+        raise ArgumentError, "Invalid baud" unless Termios::BAUD_RATES.key?(baud)
 
-      err = Termios.cfsetispeed(@termios, Termios::BAUD_RATES[baud])
-      raise SystemCallError, FFI.errno if err == -1
+        err = Termios.cfsetibaud(@termios, baud)
+        raise SystemCallError, FFI.errno if err == -1
 
-      err = Termios.cfsetospeed(@termios, Termios::BAUD_RATES[baud])
-      raise SystemCallError, FFI.errno if err == -1
+        err = Termios.cfsetobaud(@termios, baud)
+        raise SystemCallError, FFI.errno if err == -1
 
-      apply
-      refresh
-      self.baud
+        apply
+        refresh
+      end
+    else
+      def baud
+        Termios::BAUD_RATES.invert[Termios.cfgetispeed(@termios)]
+      end
+
+      def baud=(baud)
+        raise ArgumentError, "Invalid baud" unless Termios::BAUD_RATES.key?(baud)
+
+        err = Termios.cfsetispeed(@termios, Termios::BAUD_RATES[baud])
+        raise SystemCallError, FFI.errno if err == -1
+
+        err = Termios.cfsetospeed(@termios, Termios::BAUD_RATES[baud])
+        raise SystemCallError, FFI.errno if err == -1
+
+        apply
+        refresh
+      end
     end
 
     def data_bits
