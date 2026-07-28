@@ -12,8 +12,6 @@ AllCops:
 Naming/FileName:
   Exclude:
     - lib/ccutrer-serialport.rb
-RSpec/InstanceVariable:
-  Enabled: false
 RSpec/SpecFilePathFormat:
   CustomTransform:
     CCutrer: ccutrer
