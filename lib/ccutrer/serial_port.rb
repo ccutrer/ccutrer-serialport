@@ -86,7 +86,6 @@ module CCutrer
       @termios[:c_cflag] |= Termios::DATA_BITS[data_bits]
       apply
       refresh
-      self.data_bits
     end
 
     def parity
@@ -100,7 +99,6 @@ module CCutrer
       @termios[:c_cflag] |= Termios::PARITY[parity]
       apply
       refresh
-      self.parity
     end
 
     def stop_bits
@@ -114,7 +112,6 @@ module CCutrer
       @termios[:c_cflag] |= Termios::STOP_BITS[stop_bits]
       apply
       refresh
-      self.stop_bits
     end
 
     def inspect
