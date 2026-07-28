@@ -170,9 +170,9 @@ describe CCutrer::SerialPort do
       rate = 600
       @sp = CCutrer::SerialPort.new(@ports[1], baud: rate)
       fd = @sp.fileno
-      termios = CCutrer::SerialPort::Posix::Termios.new
-      CCutrer::SerialPort::Posix.tcgetattr(fd, termios)
-      expect(termios[:c_ispeed]).to eql(CCutrer::SerialPort::Posix::BAUD_RATES[rate])
+      termios = CCutrer::SerialPort::Termios::Termios.new
+      CCutrer::SerialPort::Termios.tcgetattr(fd, termios)
+      expect(termios[:c_ispeed]).to eql(CCutrer::SerialPort::Termios::BAUD_RATES[rate])
     end
   end
 end
