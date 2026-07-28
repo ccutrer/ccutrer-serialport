@@ -120,7 +120,7 @@ describe CCutrer::SerialPort do
   end
 
   describe "config" do
-    it "should accept EVEN parity" do
+    it "should accept EVEN parity", skip: "Not possible with socat" do
       sp2 = CCutrer::SerialPort.new(ports[0], baud: 19_200, data_bits: 8, parity: :even)
       sp = CCutrer::SerialPort.new(ports[1], baud: 19_200, data_bits: 8, parity: :even)
       sp.write("Hello!\n")
@@ -128,7 +128,7 @@ describe CCutrer::SerialPort do
       expect(sp2.gets).to eql("Hello!\n")
     end
 
-    it "should accept ODD parity" do
+    it "should accept ODD parity", skip: "Not possible with socat" do
       sp2 = CCutrer::SerialPort.new(ports[0], baud: 19_200, data_bits: 8, parity: :odd)
       sp = CCutrer::SerialPort.new(ports[1], baud: 19_200, data_bits: 8, parity: :odd)
       sp.write("Hello!\n")
