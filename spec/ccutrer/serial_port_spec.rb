@@ -30,8 +30,16 @@ describe CCutrer::SerialPort do
   let(:sp2) { CCutrer::SerialPort.new(ports[0]) }
 
   after do
-    sp.close
-    sp2.close
+    begin
+      sp.close
+    rescue Errno::ENOENT
+      # ignore
+    end
+    begin
+      sp2.close
+    rescue Errno::ENOENT
+      # ignore
+    end
   end
 
   it "should read and write" do
